@@ -1,0 +1,62 @@
+[
+  {
+    "agentName": "Phoenix",
+    "role": "Duelist",
+    "description": "Hailing from the UK, Phoenix's star power shines through in his fighting style, igniting the battlefield with flash and flare.",
+    "abilities": [
+      {
+        "abilityName": "Blaze",
+        "abilityDescription": "Deploys a wall of fire that blocks vision and damages anyone passing through it. It also heals Phoenix if he stands in it."
+      },
+      {
+        "abilityName": "Curveball",
+        "abilityDescription": "Throws a curved flare that detonates into a brilliant light, temporarily blinding all players who see it."
+      },
+      {
+        "abilityName": "Hot Hands",
+        "abilityDescription": "Throws a fireball that creates a lingering fire zone on the ground, damaging enemies and healing Phoenix."
+      }
+    ],
+    "ultimate": "Run It Back: Places a marker at Phoenix's location. While active, dying or allowing the timer to expire will respawn him at that location with full health."
+  },
+  {
+    "agentName": "Sage",
+    "role": "Sentinel",
+    "description": "The stronghold of China, Sage creates safety for herself and her team by reviving fallen allies and warding off aggressive pushes.",
+    "abilities": [
+      {
+        "abilityName": "Barrier Orb",
+        "abilityDescription": "Deploys a solid, four-segmented wall that can be used to block paths or boost players to higher vantage points."
+      },
+      {
+        "abilityName": "Slow Orb",
+        "abilityDescription": "Throws an orb that breaks into a field of ice, slowing and making noise when players walk across it."
+      },
+      {
+        "abilityName": "Healing Orb",
+        "abilityDescription": "Heals an ally or Sage herself over a short duration."
+      }
+    ],
+    "ultimate": "Resurrection: Targets a fallen ally's corpse to bring them back to life with full health after a brief delay."
+  },
+  {
+    "agentName": "Sova",
+    "role": "Initiator",
+    "description": "Born from the eternal winter of Russia's tundra, Sova tracks, finds, and eliminates enemies with ruthless efficiency.",
+    "abilities": [
+      {
+        "abilityName": "Owl Drone",
+        "abilityDescription": "Deploys a pilotable drone that can fire a marking dart to reveal the location of any enemy hit."
+      },
+      {
+        "abilityName": "Shock Bolt",
+        "abilityDescription": "Fires an explosive bolt that emits a damaging pulse of energy upon impact."
+      },
+      {
+        "abilityName": "Recon Bolt",
+        "abilityDescription": "Fires a bolt that deploys a sonar emitter, revealing the location of nearby enemies caught in its line of sight."
+      }
+    ],
+    "ultimate": "Hunter's Fury: Fires up to three long-range energy blasts that pierce through walls and reveal any hit enemies."
+  }
+]
