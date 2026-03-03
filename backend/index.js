@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
+import cors from "cors";
 import { readFile, writeFile } from 'fs/promises'
 import fs from 'fs'
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -11,6 +12,9 @@ import { pipeline } from '@xenova/transformers';
 
 const app = express()
 const port = 3000
+app.use(cors({
+  origin: "http://localhost:5173", // or 3000/5174 depending on React
+}));
 app.use(express.json())
 
 const agentsPath = './agents.json'
@@ -175,6 +179,17 @@ function cosineSimilarity(a, b) {
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
+// Semantic helpers
+
+function isFollowUpQuestion(q) {
+  return /\b(it|that|this|they|how long|how much|duration)\b/i.test(q);
+}
+
+function getLastTopic(history) {
+  if (!history.length) return null;
+  return history[history.length - 1].a;
+}
+
 
 // Search chunks  
 
@@ -249,13 +264,21 @@ app.post('/ask', async (req, res) => {
     const { question, sessionId = "default" } = req.body;
 
     if (!question) {
-      return res.status(400).json({ error: "Question is required" })
+      return res.status(400).json({ error: "Question is required" });
     }
 
-    const results = await searchChuncks(question, 5);
     const history = conversations.get(sessionId) || [];
+    let effectiveQuestion = question;
 
-    //  build context 
+    if (isFollowUpQuestion(question) && history.length) {
+      const lastTopic = getLastTopic(history);
+      if (lastTopic) {
+        effectiveQuestion = `${question} (about: ${lastTopic})`;
+      }
+    }
+
+    const results = await searchChuncks(effectiveQuestion, 5);
+
     const context = results
       .map((r, i) => `(${i + 1}) ${r.text}`)
       .join("\n");
@@ -265,32 +288,35 @@ app.post('/ask', async (req, res) => {
       .join("\n");
 
     const prompt = `
-    You are a Valorant knowledge assistant.
-    Answer ONLY using the context below.
-    If the answer is not in the context, say "I don't know."
-    
-    Conversation so far:
-    ${historyText}
+   You are a Valorant knowledge assistant.
+  Answer ONLY using the context below.
+  If the answer is not in the context, say "I don't know."
 
-    Context:
-    ${context}
+  Conversation so far:
+  ${historyText}
 
-    Question:
-    ${question}
+   Context:
+  ${context}
 
-    Answer:
-    `;
+   Question:
+   ${question}
 
-   
+  Answer:
+  `;
 
-    // Call gemini 
-    const model = genAI.getGenerativeModel({ model: "models/gemini-2.5-flash" })
-
+    const model = genAI.getGenerativeModel({
+      model: "models/gemini-2.5-flash"
+    });
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const answer = response.text()
+    const answer = response.text();
 
+    
+    history.push({ q: question, a: answer });
+    conversations.set(sessionId, history.slice(-5));
+
+    // send response
     res.json({
       question,
       answer,
@@ -304,15 +330,10 @@ app.post('/ask', async (req, res) => {
 
   } catch (err) {
     console.error("ASK ERROR", err);
-    res.status(500).json({ error: err.message || "Unknown error" })
+    res.status(500).json({ error: err.message || "Unknown error" });
   }
+});
 
-   history.push({ q: question, a: answer });
-
-    // keep last 5 turns only
-    conversations.set(sessionId, history.slice(-5));
-
-})
 
 
 
